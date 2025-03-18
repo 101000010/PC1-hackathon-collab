@@ -1,0 +1,26 @@
+[2025-03-17 10:43:35,135] [Thread-1 (run)] [INFO] Starting Brainflow Session (with Bluetooth connection)
+[2025-03-17 10:43:35,137] [Thread-1 (run)] [INFO] Starting dashboard.
+[2025-03-17 10:43:35,194] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-17 10:43:35,195] [Thread-1 (run)] [INFO] EEG description: {'eeg_channels': [1, 2, 3, 4], 'eeg_names': 'TP9,Fp1,Fp2,TP10', 'marker_channel': 7, 'name': 'MuseS', 'num_rows': 8, 'other_channels': [5], 'package_num_channel': 0, 'sampling_rate': 256, 'timestamp_channel': 6}
+[2025-03-17 10:43:35,196] [Thread-1 (run)] [INFO] Gyro description: {'accel_channels': [1, 2, 3], 'gyro_channels': [4, 5, 6], 'marker_channel': 8, 'name': 'MuseSAux', 'num_rows': 9, 'package_num_channel': 0, 'sampling_rate': 52, 'timestamp_channel': 7}
+[2025-03-17 10:43:35,197] [Thread-1 (run)] [INFO] PPG description: {'marker_channel': 5, 'name': 'MuseSAnc', 'num_rows': 6, 'package_num_channel': 0, 'ppg_channels': [1, 2, 3], 'sampling_rate': 64, 'timestamp_channel': 4}
+[2025-03-17 10:43:36,142] [Thread-1 (run)] [INFO] Starting 'BrainPower' Power Metric stream.
+[2025-03-17 10:43:36,149] [Thread-1 (run)] [INFO] 'BrainPower' Power Metric stream started.
+[2025-03-17 10:43:36,150] [Thread-1 (run)] [INFO] Starting 'SpectralPower' stream.
+[2025-03-17 10:43:36,157] [Thread-1 (run)] [INFO] 'SpectralPower' Power Metric stream started.
+[2025-03-17 10:43:36,157] [Thread-1 (run)] [INFO] Starting LSL event listener.
+[2025-03-17 10:43:36,158] [Thread-1 (run)] [INFO] Starting 'ixr-flow-lsl-relay' LSL event relay stream.
+[2025-03-17 10:43:36,164] [Thread-1 (run)] [INFO] 'ixr-flow-lsl-relay' LSL event relay stream started.
+[2025-03-17 10:43:36,166] [Thread-1 (run)] [INFO] Starting Brainflow LSL data publisher.
+[2025-03-17 10:43:36,168] [lsl_data_pusher] [INFO] Starting 'ixr-flow-eeg-data' LSL Data Publisher stream.
+[2025-03-17 10:43:36,175] [Thread-1 (run)] [INFO] Running IXR-flow as long as the dashboard is open, please close the dashboard to close IXR-flow.
+[2025-03-17 10:43:36,242] [lsl_data_pusher] [INFO] 'ixr-flow-eeg-data' LSL Data Publisher stream started.
+[2025-03-17 10:43:36,242] [lsl_data_pusher] [INFO] Starting 'ixr-flow-gyro-data' LSL Data Publisher stream.
+[2025-03-17 10:43:36,248] [lsl_data_pusher] [INFO] 'ixr-flow-gyro-data' LSL Data Publisher stream started.
+[2025-03-17 10:43:36,249] [lsl_data_pusher] [INFO] Starting 'ixr-flow-ppg-data' LSL Data Publisher stream.
+[2025-03-17 10:43:36,278] [lsl_data_pusher] [INFO] 'ixr-flow-ppg-data' LSL Data Publisher stream started.
+[2025-03-17 10:43:53,579] [thread_brainflow] [INFO] Succesfully started brainflow session.
+[2025-03-17 10:44:58,387] [Thread-1 (run)] [INFO] IXR-flow dashboard closed, terminating all child threads.
+[2025-03-17 10:44:58,865] [Thread-1 (run)] [INFO] Releasing all brainflow sessions.
+[2025-03-17 10:45:04,083] [Thread-1 (run)] [INFO] Successfully shutdown.
+[2025-03-17 10:45:04,084] [Thread-1 (run)] [INFO] Releasing all brainflow sessions.

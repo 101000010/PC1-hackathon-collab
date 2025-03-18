@@ -1,0 +1,38 @@
+[2025-03-18 11:25:38,108] [Thread-1 (run)] [INFO] Starting Brainflow Session (with Bluetooth connection)
+[2025-03-18 11:25:38,109] [Thread-1 (run)] [INFO] Starting dashboard.
+[2025-03-18 11:25:38,113] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-18 11:25:38,113] [Thread-1 (run)] [INFO] EEG description: {'eeg_channels': [1, 2, 3, 4], 'eeg_names': 'TP9,Fp1,Fp2,TP10', 'marker_channel': 7, 'name': 'MuseS', 'num_rows': 8, 'other_channels': [5], 'package_num_channel': 0, 'sampling_rate': 256, 'timestamp_channel': 6}
+[2025-03-18 11:25:38,114] [Thread-1 (run)] [INFO] Gyro description: {'accel_channels': [1, 2, 3], 'gyro_channels': [4, 5, 6], 'marker_channel': 8, 'name': 'MuseSAux', 'num_rows': 9, 'package_num_channel': 0, 'sampling_rate': 52, 'timestamp_channel': 7}
+[2025-03-18 11:25:38,114] [Thread-1 (run)] [INFO] PPG description: {'marker_channel': 5, 'name': 'MuseSAnc', 'num_rows': 6, 'package_num_channel': 0, 'ppg_channels': [1, 2, 3], 'sampling_rate': 64, 'timestamp_channel': 4}
+[2025-03-18 11:25:38,117] [Thread-1 (run)] [INFO] Starting 'BrainPower' Power Metric stream.
+[2025-03-18 11:25:38,119] [Thread-1 (run)] [INFO] 'BrainPower' Power Metric stream started.
+[2025-03-18 11:25:38,119] [Thread-1 (run)] [INFO] Starting 'SpectralPower' stream.
+[2025-03-18 11:25:38,121] [Thread-1 (run)] [INFO] 'SpectralPower' Power Metric stream started.
+[2025-03-18 11:25:38,121] [Thread-1 (run)] [INFO] Starting LSL event listener.
+[2025-03-18 11:25:38,122] [Thread-1 (run)] [INFO] Starting 'ixr-flow-lsl-relay' LSL event relay stream.
+[2025-03-18 11:25:38,125] [Thread-1 (run)] [INFO] 'ixr-flow-lsl-relay' LSL event relay stream started.
+[2025-03-18 11:25:38,125] [Thread-1 (run)] [INFO] Starting Brainflow LSL data publisher.
+[2025-03-18 11:25:38,126] [lsl_data_pusher] [INFO] Starting 'ixr-flow-eeg-data' LSL Data Publisher stream.
+[2025-03-18 11:25:38,127] [Thread-1 (run)] [INFO] Running IXR-flow as long as the dashboard is open, please close the dashboard to close IXR-flow.
+[2025-03-18 11:25:38,132] [lsl_data_pusher] [INFO] 'ixr-flow-eeg-data' LSL Data Publisher stream started.
+[2025-03-18 11:25:38,134] [lsl_data_pusher] [INFO] Starting 'ixr-flow-gyro-data' LSL Data Publisher stream.
+[2025-03-18 11:25:38,137] [lsl_data_pusher] [INFO] 'ixr-flow-gyro-data' LSL Data Publisher stream started.
+[2025-03-18 11:25:38,137] [lsl_data_pusher] [INFO] Starting 'ixr-flow-ppg-data' LSL Data Publisher stream.
+[2025-03-18 11:25:38,212] [lsl_data_pusher] [INFO] 'ixr-flow-ppg-data' LSL Data Publisher stream started.
+[2025-03-18 11:25:42,551] [thread_brainflow] [INFO] Succesfully started brainflow session.
+[2025-03-18 11:29:45,367] [thread_brainflow] [WARNING] Brainflow session connection time out, trying to reconnect.
+[2025-03-18 11:29:46,384] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-18 11:30:17,431] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-18 11:30:17,431] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-18 11:30:48,477] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-18 11:30:48,477] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-18 11:31:19,523] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-18 11:31:19,523] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-18 11:31:33,624] [thread_brainflow] [INFO] Succesfully started brainflow session.
+[2025-03-18 11:31:35,626] [thread_brainflow] [WARNING] Brainflow session connection time out, trying to reconnect.
+[2025-03-18 11:31:36,654] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-18 11:31:48,477] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-18 11:31:48,477] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-18 11:31:53,455] [thread_brainflow] [INFO] Succesfully started brainflow session.
+[2025-03-18 11:34:54,053] [Thread-1 (run)] [INFO] IXR-flow dashboard closed, terminating all child threads.
+[2025-03-18 11:34:54,906] [Thread-1 (run)] [INFO] Releasing all brainflow sessions.

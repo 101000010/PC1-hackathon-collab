@@ -1,0 +1,13 @@
+[2025-03-17 11:00:15,167] [Thread-2 (run)] [INFO] Starting Brainflow Session (with Bluetooth connection)
+[2025-03-17 11:00:15,168] [Thread-2 (run)] [INFO] Starting dashboard.
+[2025-03-17 11:00:15,168] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-17 11:00:15,169] [Thread-2 (run)] [INFO] EEG description: {'eeg_channels': [1, 2, 3, 4], 'eeg_names': 'TP9,Fp1,Fp2,TP10', 'marker_channel': 7, 'name': 'MuseS', 'num_rows': 8, 'other_channels': [5], 'package_num_channel': 0, 'sampling_rate': 256, 'timestamp_channel': 6}
+[2025-03-17 11:00:15,169] [Thread-2 (run)] [INFO] Gyro description: {'accel_channels': [1, 2, 3], 'gyro_channels': [4, 5, 6], 'marker_channel': 8, 'name': 'MuseSAux', 'num_rows': 9, 'package_num_channel': 0, 'sampling_rate': 52, 'timestamp_channel': 7}
+[2025-03-17 11:00:15,169] [Thread-2 (run)] [INFO] PPG description: {'marker_channel': 5, 'name': 'MuseSAnc', 'num_rows': 6, 'package_num_channel': 0, 'ppg_channels': [1, 2, 3], 'sampling_rate': 64, 'timestamp_channel': 4}
+[2025-03-17 11:00:15,170] [Thread-2 (run)] [INFO] Starting 'BrainPower' Power Metric stream.
+[2025-03-17 11:00:15,173] [Thread-2 (run)] [INFO] 'BrainPower' Power Metric stream started.
+[2025-03-17 11:00:15,173] [Thread-2 (run)] [INFO] Starting 'SpectralPower' stream.
+[2025-03-17 11:00:15,176] [Thread-2 (run)] [INFO] 'SpectralPower' Power Metric stream started.
+[2025-03-17 11:00:15,177] [Thread-2 (run)] [INFO] Starting LSL event listener.
+[2025-03-17 11:00:15,177] [Thread-2 (run)] [INFO] Starting 'ixr-flow-lsl-relay' LSL event relay stream.
+[2025-03-17 11:00:15,217] [Thread-2 (run)] [INFO] 'ixr-flow-lsl-relay' LSL event relay stream started.
