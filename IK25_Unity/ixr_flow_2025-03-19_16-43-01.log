@@ -1,0 +1,73 @@
+[2025-03-19 16:24:21,737] [Thread-1 (run)] [INFO] Starting Brainflow Session (with Bluetooth connection)
+[2025-03-19 16:24:21,740] [Thread-1 (run)] [INFO] Starting dashboard.
+[2025-03-19 16:24:21,747] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:24:21,747] [Thread-1 (run)] [INFO] EEG description: {'eeg_channels': [1, 2, 3, 4], 'eeg_names': 'TP9,Fp1,Fp2,TP10', 'marker_channel': 7, 'name': 'MuseS', 'num_rows': 8, 'other_channels': [5], 'package_num_channel': 0, 'sampling_rate': 256, 'timestamp_channel': 6}
+[2025-03-19 16:24:21,749] [Thread-1 (run)] [INFO] Gyro description: {'accel_channels': [1, 2, 3], 'gyro_channels': [4, 5, 6], 'marker_channel': 8, 'name': 'MuseSAux', 'num_rows': 9, 'package_num_channel': 0, 'sampling_rate': 52, 'timestamp_channel': 7}
+[2025-03-19 16:24:21,753] [Thread-1 (run)] [INFO] PPG description: {'marker_channel': 5, 'name': 'MuseSAnc', 'num_rows': 6, 'package_num_channel': 0, 'ppg_channels': [1, 2, 3], 'sampling_rate': 64, 'timestamp_channel': 4}
+[2025-03-19 16:24:21,765] [Thread-1 (run)] [INFO] Starting 'BrainPower' Power Metric stream.
+[2025-03-19 16:24:21,773] [Thread-1 (run)] [INFO] 'BrainPower' Power Metric stream started.
+[2025-03-19 16:24:21,774] [Thread-1 (run)] [INFO] Starting 'SpectralPower' stream.
+[2025-03-19 16:24:21,779] [Thread-1 (run)] [INFO] 'SpectralPower' Power Metric stream started.
+[2025-03-19 16:24:21,781] [Thread-1 (run)] [INFO] Starting LSL event listener.
+[2025-03-19 16:24:21,782] [Thread-1 (run)] [INFO] Starting 'ixr-flow-lsl-relay' LSL event relay stream.
+[2025-03-19 16:24:21,790] [Thread-1 (run)] [INFO] 'ixr-flow-lsl-relay' LSL event relay stream started.
+[2025-03-19 16:24:21,792] [Thread-1 (run)] [INFO] Starting Brainflow LSL data publisher.
+[2025-03-19 16:24:21,794] [Thread-1 (run)] [INFO] Running IXR-flow as long as the dashboard is open, please close the dashboard to close IXR-flow.
+[2025-03-19 16:24:21,794] [lsl_data_pusher] [INFO] Starting 'ixr-flow-eeg-data' LSL Data Publisher stream.
+[2025-03-19 16:24:21,894] [lsl_data_pusher] [INFO] 'ixr-flow-eeg-data' LSL Data Publisher stream started.
+[2025-03-19 16:24:21,906] [lsl_data_pusher] [INFO] Starting 'ixr-flow-gyro-data' LSL Data Publisher stream.
+[2025-03-19 16:24:22,912] [lsl_data_pusher] [INFO] 'ixr-flow-gyro-data' LSL Data Publisher stream started.
+[2025-03-19 16:24:22,914] [lsl_data_pusher] [INFO] Starting 'ixr-flow-ppg-data' LSL Data Publisher stream.
+[2025-03-19 16:24:22,929] [lsl_data_pusher] [INFO] 'ixr-flow-ppg-data' LSL Data Publisher stream started.
+[2025-03-19 16:24:52,865] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:24:52,866] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:25:23,969] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:25:23,970] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:25:55,045] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:25:55,046] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:26:26,096] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:26:26,096] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:26:57,172] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:26:57,173] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:27:28,216] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:27:28,216] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:27:59,263] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:27:59,264] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:28:30,364] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:28:30,364] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:29:01,404] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:29:01,405] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:29:32,450] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:29:32,451] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:30:03,499] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:30:03,500] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:30:34,542] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:30:34,543] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:31:05,612] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:31:05,618] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:31:36,671] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:31:36,673] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:32:07,717] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:32:07,717] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:32:38,755] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:32:38,755] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:33:09,791] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:33:09,792] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:33:40,829] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:33:40,830] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:34:11,855] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:34:11,855] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:34:42,888] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:34:42,888] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:35:13,917] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:35:13,918] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:35:44,947] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:35:44,947] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:36:15,977] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:36:15,978] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:36:47,013] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:36:47,013] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:37:18,043] [thread_brainflow] [INFO] Failed to prepare sessions, trying again.
+[2025-03-19 16:37:18,043] [thread_brainflow] [INFO] Starting brainflow session.
+[2025-03-19 16:37:31,224] [MainThread] [WARNING] A file with this name ixr_flow.log already exists. The old file has been renamed with a timestamp.
+[2025-03-19 16:37:38,401] [MainThread] [WARNING] A file with this name ixr_flow.log already exists. The old file has been renamed with a timestamp.
