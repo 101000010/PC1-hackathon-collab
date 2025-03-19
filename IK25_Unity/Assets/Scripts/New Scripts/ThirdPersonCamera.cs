@@ -7,7 +7,7 @@ public class ThirdPersonCamera : MonoBehaviour
     public GameObject target; // The object the camera follows
     private float targetDistance; // Distance between the camera and the target
     public float minTurnAngle = -90.0f; // Minimum vertical angle
-    public float maxTurnAngle = 0.0f; // Maximum vertical angle
+    public float maxTurnAngle = 90.0f; // Maximum vertical angle
     private float rotX; // Vertical rotation (pitch)
     private float rotY; // Horizontal rotation (yaw)
 
@@ -34,7 +34,7 @@ public class ThirdPersonCamera : MonoBehaviour
         rotY = transform.eulerAngles.y;
     }
 
-    void Update()
+    void LateUpdate()
     {
         if (dualObjectMover == null || target == null) return;
 
@@ -42,15 +42,16 @@ public class ThirdPersonCamera : MonoBehaviour
         float horizontalInput = dualObjectMover.GetHorizontalInput();
         float verticalInput = dualObjectMover.GetVerticalInput();
 
-        // Update horizontal and vertical rotation
+        // Update horizontal and vertical rotation based on input
         rotY += horizontalInput * turnSpeed; // Horizontal rotation (yaw)
         rotX += verticalInput * turnSpeed; // Vertical rotation (pitch)
 
         // Clamp the vertical rotation to prevent flipping
         rotX = Mathf.Clamp(rotX, minTurnAngle, maxTurnAngle);
 
-        // Apply the rotation to the camera
-        transform.rotation = Quaternion.Euler(-rotX, rotY, 0);
+        // Apply the rotation to the camera relative to the target's rotation
+        Quaternion targetRotation = Quaternion.Euler(-rotX, rotY, 0) * target.transform.rotation;
+        transform.rotation = targetRotation;
 
         // Maintain the camera's position relative to the target
         Vector3 targetPosition = target.transform.position - (transform.forward * targetDistance);

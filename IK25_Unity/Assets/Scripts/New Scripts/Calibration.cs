@@ -23,6 +23,9 @@ public class Calibration : MonoBehaviour
 
     private Coroutine calibrationCoroutine;
 
+    [SerializeField]
+    private float calibrationDuration = 5f; // Adjustable duration for each calibration step
+
     void Start()
     {
         if (leftArmRMSFilter != null)
@@ -114,28 +117,50 @@ public class Calibration : MonoBehaviour
 
     private IEnumerator CalibrationProcess()
     {
-        Debug.Log("Move your right arm up a couple of times.");
-        yield return new WaitForSeconds(5f); // Wait for 5 seconds
+        Debug.Log("Move your right arm up and contract your muscles.");
+        yield return new WaitForSeconds(calibrationDuration); // Wait for the specified duration
         rightArmUpChannel = GetPrimaryChannel(rightArmMaxValues);
         Debug.Log($"Right arm up channel: {rightArmUpChannel}");
 
         ResetMaxValues();
         Debug.Log("Move your right arm down and contract your muscles.");
-        yield return new WaitForSeconds(5f); // Wait for 5 seconds
+        yield return new WaitForSeconds(calibrationDuration); // Wait for the specified duration
         rightArmDownChannel = GetPrimaryChannel(rightArmMaxValues);
         Debug.Log($"Right arm down channel: {rightArmDownChannel}");
 
+        // Check if the right arm indices are the same
+        if (rightArmUpChannel == rightArmDownChannel)
+        {
+            Debug.LogError("Calibration failed, please try again.");
+            Debug.Log("Restarting the Calibration...");
+            isCalibrating = false; // Reset the flag before restarting
+            yield return new WaitForSeconds(4f); // Wait for 4 seconds before restarting
+            StartCalibration();
+            yield break;
+        }
+
         ResetMaxValues();
         Debug.Log("Move your left arm to the left and contract your muscles.");
-        yield return new WaitForSeconds(5f); // Wait for 5 seconds
+        yield return new WaitForSeconds(calibrationDuration); // Wait for the specified duration
         leftArmLeftChannel = GetPrimaryChannel(leftArmMaxValues);
         Debug.Log($"Left arm left channel: {leftArmLeftChannel}");
 
         ResetMaxValues();
         Debug.Log("Move your left arm to the right and contract your muscles.");
-        yield return new WaitForSeconds(5f); // Wait for 5 seconds
+        yield return new WaitForSeconds(calibrationDuration); // Wait for the specified duration
         leftArmRightChannel = GetPrimaryChannel(leftArmMaxValues);
         Debug.Log($"Left arm right channel: {leftArmRightChannel}");
+
+        // Check if the left arm indices are the same
+        if (leftArmLeftChannel == leftArmRightChannel)
+        {
+            Debug.LogError("Calibration failed, please try again.");
+            Debug.Log("Restarting the Calibration...");
+            isCalibrating = false; // Reset the flag before restarting
+            yield return new WaitForSeconds(4f); // Wait for 4 seconds before restarting
+            StartCalibration();
+            yield break;
+        }
 
         Debug.Log("Calibration completed.");
         isCalibrating = false;
