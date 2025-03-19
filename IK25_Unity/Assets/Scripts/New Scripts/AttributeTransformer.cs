@@ -42,15 +42,15 @@ public class AttributeTransformer : MonoBehaviour
 
         Debug.Log("Received data sample: " + string.Join(", ", sample)); 
 
-            if (focusValue >= 0 && focusValue < 0.2f) {
+            if (focusValue >= 0 && focusValue < 0.3f) {
                 blossom.GetComponent<Renderer>().material = FocusLevel1;
-            } else if (focusValue >= 0.2f && focusValue < 0.4f) {
+            } else if (focusValue >= 0.3f && focusValue < 0.4f) {
                 blossom.GetComponent<Renderer>().material = FocusLevel2;
-            } else if (focusValue >= 0.4f && focusValue <= 0.6f) {
+            } else if (focusValue >= 0.4f && focusValue <= 0.5f) {
                 blossom.GetComponent<Renderer>().material = FocusLevel3;
-            } else if (focusValue >= 0.6f && focusValue <= 0.8f) {
+            } else if (focusValue >= 0.5f && focusValue <= 0.6f) {
                 blossom.GetComponent<Renderer>().material = FocusLevel3;
-            } else if (focusValue >= 0.8f && focusValue <= 1f) {
+            } else if (focusValue >= 0.6f && focusValue <= 1f) {
                 blossom.GetComponent<Renderer>().material = FocusLevel3;
             }
 
