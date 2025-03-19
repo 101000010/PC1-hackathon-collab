@@ -184,6 +184,7 @@ MonoBehaviour:
   calibration: {fileID: 981847035}
   objectToMove: {fileID: 450668920}
   maxSpeed: 10
+  smoothingFactor: 0.1
 --- !u!1 &130677376
 GameObject:
   m_ObjectHideFlags: 0
@@ -615,7 +616,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 952435fbf3db5cc41973241181b19741, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  turnSpeed: 4
+  turnSpeed: 0
   target: {fileID: 450668919}
   minTurnAngle: -90
   maxTurnAngle: 0

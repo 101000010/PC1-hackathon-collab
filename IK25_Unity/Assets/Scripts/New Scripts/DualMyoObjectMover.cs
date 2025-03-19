@@ -19,8 +19,12 @@ namespace PlayBionic.MyoOsu.Management
         [SerializeField]
         private float maxSpeed = 10f; // Maximum speed of the object
 
+        [SerializeField]
+        private float smoothingFactor = 0.1f; // Smoothing factor for input values
+
         private float horizontalInput = 0f; // Left/right movement (controlled by left arm)
         private float verticalInput = 0f;   // Up/down movement (controlled by right arm)
+        private float forwardInput = 0f;   // Forward/backward movement (based on muscle strength)
 
         private Vector3 movementDirection = Vector3.zero;
 
@@ -54,22 +58,40 @@ namespace PlayBionic.MyoOsu.Management
         {
             if (calibration == null || !calibration.IsCalibrated) return;
 
-            // Get the primary channel for the left arm
-            int primaryChannel = calibration.GetLeftArmPrimaryChannel();
+            // Get the primary channels for left arm (left/right movement)
+            int leftChannel = calibration.GetLeftArmLeftChannel();
+            int rightChannel = calibration.GetLeftArmRightChannel();
 
-            // Use the RMS value of the primary channel for horizontal input (e.g., left/right movement)
-            horizontalInput = Mathf.Clamp(rmsValues[primaryChannel], 0, 1) * maxSpeed;
+            // Calculate horizontal input based on the difference between left and right channels
+            float leftValue = Mathf.Clamp(rmsValues[leftChannel], 0, 1);
+            float rightValue = Mathf.Clamp(rmsValues[rightChannel], 0, 1);
+
+            float targetHorizontalInput = (rightValue - leftValue); // Positive for right, negative for left
+            horizontalInput = Mathf.Lerp(horizontalInput, targetHorizontalInput * maxSpeed, smoothingFactor);
+
+            // Use the average of left and right channels for forward/backward movement (z-axis)
+            float targetForwardInput = (leftValue + rightValue) / 2; // Average strength
+            forwardInput = Mathf.Lerp(forwardInput, targetForwardInput * maxSpeed, smoothingFactor);
         }
 
         private void HandleRightArmData(float[] rmsValues, double timestamp)
         {
             if (calibration == null || !calibration.IsCalibrated) return;
 
-            // Get the primary channel for the right arm
-            int primaryChannel = calibration.GetRightArmPrimaryChannel();
+            // Get the primary channels for right arm (up/down movement)
+            int upChannel = calibration.GetRightArmUpChannel();
+            int downChannel = calibration.GetRightArmDownChannel();
 
-            // Use the RMS value of the primary channel for vertical input (e.g., up/down movement)
-            verticalInput = Mathf.Clamp(rmsValues[primaryChannel], 0, 1) * maxSpeed;
+            // Calculate vertical input based on the difference between up and down channels
+            float upValue = Mathf.Clamp(rmsValues[upChannel], 0, 1);
+            float downValue = Mathf.Clamp(rmsValues[downChannel], 0, 1);
+
+            float targetVerticalInput = (upValue - downValue); // Positive for up, negative for down
+            verticalInput = Mathf.Lerp(verticalInput, targetVerticalInput * maxSpeed, smoothingFactor);
+
+            // Use the average of up and down channels for forward/backward movement (z-axis)
+            float targetForwardInput = (upValue + downValue) / 2; // Average strength
+            forwardInput = Mathf.Lerp(forwardInput, targetForwardInput * maxSpeed, smoothingFactor);
         }
 
         // Public method to get vertical input
@@ -90,12 +112,15 @@ namespace PlayBionic.MyoOsu.Management
             if (calibration == null || !calibration.IsCalibrated) return;
 
             // Calculate movement direction based on the inputs
-            movementDirection = new Vector3(horizontalInput, verticalInput, 0); // Left/right (x), up/down (y)
+            movementDirection = new Vector3(horizontalInput, verticalInput, forwardInput); // Left/right (x), up/down (y), forward/backward (z)
 
             // Apply movement
             if (objectToMove != null)
             {
                 objectToMove.Translate(movementDirection * Time.deltaTime);
+
+                // Debug the movement direction
+                Debug.Log($"Movement Direction: {movementDirection}");
             }
         }
     }

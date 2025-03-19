@@ -1,6 +1,6 @@
 using UnityEngine;
-using System.Collections.Generic;
-using PlayBionic.MyoOsu.Management;
+using System.Collections;
+using PlayBionic.MyoOsu.Management; // Replace with the actual namespace of RMSFilter
 
 public class Calibration : MonoBehaviour
 {
@@ -11,29 +11,20 @@ public class Calibration : MonoBehaviour
     private RMSFilter rightArmRMSFilter; // RMSFilter for the right arm Myo Armband
 
     private float[] leftArmMaxValues = new float[8];
-    private float[] leftArmMinValues = new float[8];
-
     private float[] rightArmMaxValues = new float[8];
-    private float[] rightArmMinValues = new float[8];
 
-    private int leftArmPrimaryChannel = -1; // Channel with the highest value for the left arm
-    private int rightArmPrimaryChannel = -1; // Channel with the highest value for the right arm
+    private int rightArmUpChannel = -1; // Channel for right arm up movement
+    private int rightArmDownChannel = -1; // Channel for right arm down movement
+    private int leftArmLeftChannel = -1; // Channel for left arm left movement
+    private int leftArmRightChannel = -1; // Channel for left arm right movement
 
     private bool isCalibrating = false;
     public bool IsCalibrated { get; private set; } = false; // Indicates if calibration is complete
 
+    private Coroutine calibrationCoroutine;
+
     void Start()
     {
-        // Initialize min and max values
-        for (int i = 0; i < 8; i++)
-        {
-            leftArmMaxValues[i] = float.MinValue;
-            leftArmMinValues[i] = float.MaxValue;
-
-            rightArmMaxValues[i] = float.MinValue;
-            rightArmMinValues[i] = float.MaxValue;
-        }
-
         if (leftArmRMSFilter != null)
         {
             leftArmRMSFilter.OnDataReceived += HandleLeftArmData;
@@ -53,10 +44,6 @@ public class Calibration : MonoBehaviour
             if (!isCalibrating)
             {
                 StartCalibration();
-            }
-            else
-            {
-                StopCalibration();
             }
         }
     }
@@ -81,7 +68,6 @@ public class Calibration : MonoBehaviour
         for (int i = 0; i < rmsValues.Length; i++)
         {
             leftArmMaxValues[i] = Mathf.Max(leftArmMaxValues[i], rmsValues[i]);
-            leftArmMinValues[i] = Mathf.Min(leftArmMinValues[i], rmsValues[i]);
         }
     }
 
@@ -92,44 +78,7 @@ public class Calibration : MonoBehaviour
         for (int i = 0; i < rmsValues.Length; i++)
         {
             rightArmMaxValues[i] = Mathf.Max(rightArmMaxValues[i], rmsValues[i]);
-            rightArmMinValues[i] = Mathf.Min(rightArmMinValues[i], rmsValues[i]);
         }
-    }
-
-    public void StartCalibration()
-    {
-        isCalibrating = true;
-        IsCalibrated = false;
-
-        // Reset min and max values
-        for (int i = 0; i < 8; i++)
-        {
-            leftArmMaxValues[i] = float.MinValue;
-            leftArmMinValues[i] = float.MaxValue;
-
-            rightArmMaxValues[i] = float.MinValue;
-            rightArmMinValues[i] = float.MaxValue;
-        }
-
-        Debug.Log("Calibration started. For the right arm, move your hand up and down and contract your muscles. For the left arm, move your hand left and right and contract your muscles.");
-    }
-
-    public void StopCalibration()
-    {
-        isCalibrating = false;
-        IsCalibrated = true;
-
-        // Identify the primary channel for each arm
-        leftArmPrimaryChannel = GetPrimaryChannel(leftArmMaxValues);
-        rightArmPrimaryChannel = GetPrimaryChannel(rightArmMaxValues);
-
-        Debug.Log("Calibration completed.");
-        Debug.Log("Left Arm Max Values: " + string.Join(", ", leftArmMaxValues));
-        Debug.Log("Left Arm Min Values: " + string.Join(", ", leftArmMinValues));
-        Debug.Log("Right Arm Max Values: " + string.Join(", ", rightArmMaxValues));
-        Debug.Log("Right Arm Min Values: " + string.Join(", ", rightArmMinValues));
-        Debug.Log($"Left Arm Primary Channel: {leftArmPrimaryChannel}");
-        Debug.Log($"Right Arm Primary Channel: {rightArmPrimaryChannel}");
     }
 
     private int GetPrimaryChannel(float[] maxValues)
@@ -149,33 +98,76 @@ public class Calibration : MonoBehaviour
         return primaryChannel;
     }
 
-    public float[] NormalizeLeftArmData(float[] rmsValues)
+    public void StartCalibration()
     {
-        float[] normalizedValues = new float[8];
-        for (int i = 0; i < rmsValues.Length; i++)
+        if (isCalibrating) return;
+
+        isCalibrating = true;
+        IsCalibrated = false;
+
+        // Reset max values
+        ResetMaxValues();
+
+        // Start the calibration process
+        calibrationCoroutine = StartCoroutine(CalibrationProcess());
+    }
+
+    private IEnumerator CalibrationProcess()
+    {
+        Debug.Log("Move your right arm up a couple of times.");
+        yield return new WaitForSeconds(5f); // Wait for 5 seconds
+        rightArmUpChannel = GetPrimaryChannel(rightArmMaxValues);
+        Debug.Log($"Right arm up channel: {rightArmUpChannel}");
+
+        ResetMaxValues();
+        Debug.Log("Move your right arm down and contract your muscles.");
+        yield return new WaitForSeconds(5f); // Wait for 5 seconds
+        rightArmDownChannel = GetPrimaryChannel(rightArmMaxValues);
+        Debug.Log($"Right arm down channel: {rightArmDownChannel}");
+
+        ResetMaxValues();
+        Debug.Log("Move your left arm to the left and contract your muscles.");
+        yield return new WaitForSeconds(5f); // Wait for 5 seconds
+        leftArmLeftChannel = GetPrimaryChannel(leftArmMaxValues);
+        Debug.Log($"Left arm left channel: {leftArmLeftChannel}");
+
+        ResetMaxValues();
+        Debug.Log("Move your left arm to the right and contract your muscles.");
+        yield return new WaitForSeconds(5f); // Wait for 5 seconds
+        leftArmRightChannel = GetPrimaryChannel(leftArmMaxValues);
+        Debug.Log($"Left arm right channel: {leftArmRightChannel}");
+
+        Debug.Log("Calibration completed.");
+        isCalibrating = false;
+        IsCalibrated = true;
+    }
+
+    private void ResetMaxValues()
+    {
+        for (int i = 0; i < 8; i++)
         {
-            normalizedValues[i] = Mathf.InverseLerp(leftArmMinValues[i], leftArmMaxValues[i], rmsValues[i]);
+            leftArmMaxValues[i] = float.MinValue;
+            rightArmMaxValues[i] = float.MinValue;
         }
-        return normalizedValues;
     }
 
-    public float[] NormalizeRightArmData(float[] rmsValues)
+    public int GetRightArmUpChannel()
     {
-        float[] normalizedValues = new float[8];
-        for (int i = 0; i < rmsValues.Length; i++)
-        {
-            normalizedValues[i] = Mathf.InverseLerp(rightArmMinValues[i], rightArmMaxValues[i], rmsValues[i]);
-        }
-        return normalizedValues;
+        return rightArmUpChannel;
     }
 
-    public int GetLeftArmPrimaryChannel()
+    public int GetRightArmDownChannel()
     {
-        return leftArmPrimaryChannel;
+        return rightArmDownChannel;
     }
 
-    public int GetRightArmPrimaryChannel()
+    public int GetLeftArmLeftChannel()
     {
-        return rightArmPrimaryChannel;
+        return leftArmLeftChannel;
+    }
+
+    public int GetLeftArmRightChannel()
+    {
+        return leftArmRightChannel;
     }
 }
