@@ -44,13 +44,13 @@ public class AttributeTransformer : MonoBehaviour
 
             if (focusValue >= 0 && focusValue < 0.3f) {
                 blossom.GetComponent<Renderer>().material = FocusLevel1;
-            } else if (focusValue >= 0.3f && focusValue < 0.4f) {
+            } else if (focusValue >= 0.3f && focusValue < 0.37f) {
                 blossom.GetComponent<Renderer>().material = FocusLevel2;
-            } else if (focusValue >= 0.4f && focusValue <= 0.5f) {
+            } else if (focusValue >= 0.37f && focusValue <= 0.44f) {
                 blossom.GetComponent<Renderer>().material = FocusLevel3;
-            } else if (focusValue >= 0.5f && focusValue <= 0.6f) {
+            } else if (focusValue >= 0.44f && focusValue <= 0.53f) {
                 blossom.GetComponent<Renderer>().material = FocusLevel3;
-            } else if (focusValue >= 0.6f && focusValue <= 1f) {
+            } else if (focusValue >= 0.53f && focusValue <= 1f) {
                 blossom.GetComponent<Renderer>().material = FocusLevel3;
             }
 
