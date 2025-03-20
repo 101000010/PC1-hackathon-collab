@@ -19,10 +19,21 @@ namespace PlayBionic.MyoOsu.Management
         [SerializeField]
         private float maxSpeed = 10f; // Maximum speed of the object
 
-        private float horizontalInput = 0f; // Left/right movement (controlled by left arm)
-        private float verticalInput = 0f;   // Up/down movement (controlled by right arm)
+        [SerializeField]
+        private float rotationSpeed = 100f; // Speed of rotation
+
+        [SerializeField]
+        private float smoothingFactor = 0.1f; // Smoothing factor for input values
+
+        [SerializeField]
+        private float movementSpeedMultiplier = 1.0f; // Multiplier for movement speed
+
+        private float horizontalInput = 0f; // Left/right rotation (controlled by left arm)
+        private float forwardInput = 0f;   // Forward/backward movement (based on both arms)
+        private float verticalInput = 0f; // Up/down movement (based on right arm)
 
         private Vector3 movementDirection = Vector3.zero;
+        private Vector3 rotationDirection = Vector3.zero; // Rotation direction (yaw only)
 
         private void Awake()
         {
@@ -54,34 +65,43 @@ namespace PlayBionic.MyoOsu.Management
         {
             if (calibration == null || !calibration.IsCalibrated) return;
 
-            // Get the primary channel for the left arm
-            int primaryChannel = calibration.GetLeftArmPrimaryChannel();
+            // Get the primary channels for left arm (left/right movement)
+            int leftChannel = calibration.GetLeftArmLeftChannel();
+            int rightChannel = calibration.GetLeftArmRightChannel();
 
-            // Use the RMS value of the primary channel for horizontal input (e.g., left/right movement)
-            horizontalInput = Mathf.Clamp(rmsValues[primaryChannel], 0, 1) * maxSpeed;
+            // Calculate horizontal rotation (yaw) based on the difference between left and right channels
+            float leftValue = Mathf.Clamp(rmsValues[leftChannel], 0, 1);
+            float rightValue = Mathf.Clamp(rmsValues[rightChannel], 0, 1);
+
+            float targetYawInput = (rightValue - leftValue); // Positive for right, negative for left
+            horizontalInput = Mathf.Lerp(horizontalInput, targetYawInput * rotationSpeed, smoothingFactor);
+
+            // Update rotation direction (yaw only)
+            rotationDirection = new Vector3(0, horizontalInput, 0); // Yaw (y-axis only)
+
+            // Use the average of left and right channels for forward movement
+            float targetForwardInput = (leftValue + rightValue) / 2; // Average strength
+            forwardInput = Mathf.Lerp(forwardInput, targetForwardInput * maxSpeed, smoothingFactor);
         }
 
         private void HandleRightArmData(float[] rmsValues, double timestamp)
         {
             if (calibration == null || !calibration.IsCalibrated) return;
 
-            // Get the primary channel for the right arm
-            int primaryChannel = calibration.GetRightArmPrimaryChannel();
+            // Get the primary channels for right arm (up/down movement)
+            int upChannel = calibration.GetRightArmUpChannel();
+            int downChannel = calibration.GetRightArmDownChannel();
 
-            // Use the RMS value of the primary channel for vertical input (e.g., up/down movement)
-            verticalInput = Mathf.Clamp(rmsValues[primaryChannel], 0, 1) * maxSpeed;
-        }
+            // Calculate vertical movement (Y-axis) based on the difference between up and down channels
+            float upValue = Mathf.Clamp(rmsValues[upChannel], 0, 1);
+            float downValue = Mathf.Clamp(rmsValues[downChannel], 0, 1);
 
-        // Public method to get vertical input
-        public float GetVerticalInput()
-        {
-            return verticalInput;
-        }
+            float targetVerticalInput = (upValue - downValue); // Positive for up, negative for down
+            verticalInput = Mathf.Lerp(verticalInput, targetVerticalInput * maxSpeed, smoothingFactor);
 
-        // Public method to get horizontal input
-        public float GetHorizontalInput()
-        {
-            return horizontalInput;
+            // Combine right arm input with left arm input for forward movement
+            float targetForwardInput = (upValue + downValue) / 2; // Average strength
+            forwardInput = Mathf.Lerp(forwardInput, targetForwardInput * maxSpeed, smoothingFactor);
         }
 
         private void Update()
@@ -89,14 +109,33 @@ namespace PlayBionic.MyoOsu.Management
             // Do not move the object if calibration is not complete
             if (calibration == null || !calibration.IsCalibrated) return;
 
-            // Calculate movement direction based on the inputs
-            movementDirection = new Vector3(horizontalInput, verticalInput, 0); // Left/right (x), up/down (y)
+            // Ensure forwardInput is positive for forward movement
+            forwardInput = Mathf.Abs(forwardInput);
 
-            // Apply movement
+            // Calculate movement direction based on the inputs and apply the movement speed multiplier
+            movementDirection = new Vector3(0, verticalInput, forwardInput) * movementSpeedMultiplier; // Up/down (Y-axis), forward/backward (Z-axis)
+
+            // Apply movement in the object's local space
             if (objectToMove != null)
             {
-                objectToMove.Translate(movementDirection * Time.deltaTime);
+                objectToMove.Translate(movementDirection * Time.deltaTime, Space.Self); // Use Space.Self for local movement
+
+                // Apply rotation (yaw only)
+                objectToMove.Rotate(rotationDirection * Time.deltaTime, Space.Self);
+
+                // Debug the movement and rotation directions
+                Debug.Log($"Movement Direction: {movementDirection}, Rotation Direction: {rotationDirection}");
             }
+        }
+
+        public float GetHorizontalInput()
+        {
+            return horizontalInput;
+        }
+
+        public float GetVerticalInput()
+        {
+            return forwardInput; // Assuming vertical input is represented by forwardInput
         }
     }
 }

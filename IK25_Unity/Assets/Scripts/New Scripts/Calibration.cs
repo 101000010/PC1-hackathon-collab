@@ -1,6 +1,8 @@
 using UnityEngine;
-using System.Collections.Generic;
-using PlayBionic.MyoOsu.Management;
+using UnityEngine.UI; // For UI Text
+using System.Collections;
+using PlayBionic.MyoOsu.Management; // Replace with the actual namespace of RMSFilter
+using TMPro; // For TextMeshProUGUI
 
 public class Calibration : MonoBehaviour
 {
@@ -10,30 +12,28 @@ public class Calibration : MonoBehaviour
     [SerializeField]
     private RMSFilter rightArmRMSFilter; // RMSFilter for the right arm Myo Armband
 
+    [SerializeField]
+    private TextMeshProUGUI calibrationMessage; // Reference to the Text UI element
+
     private float[] leftArmMaxValues = new float[8];
-    private float[] leftArmMinValues = new float[8];
-
     private float[] rightArmMaxValues = new float[8];
-    private float[] rightArmMinValues = new float[8];
 
-    private int leftArmPrimaryChannel = -1; // Channel with the highest value for the left arm
-    private int rightArmPrimaryChannel = -1; // Channel with the highest value for the right arm
+    private int rightArmUpChannel = -1; // Channel for right arm up movement
+    private int rightArmDownChannel = -1; // Channel for right arm down movement
+    private int leftArmLeftChannel = -1; // Channel for left arm left movement
+    private int leftArmRightChannel = -1; // Channel for left arm right movement
 
     private bool isCalibrating = false;
+    private bool calibrationFailed = false; // Flag to track if calibration failed
     public bool IsCalibrated { get; private set; } = false; // Indicates if calibration is complete
+
+    private Coroutine calibrationCoroutine;
+
+    [SerializeField]
+    private float calibrationDuration = 5f; // Adjustable duration for each calibration step
 
     void Start()
     {
-        // Initialize min and max values
-        for (int i = 0; i < 8; i++)
-        {
-            leftArmMaxValues[i] = float.MinValue;
-            leftArmMinValues[i] = float.MaxValue;
-
-            rightArmMaxValues[i] = float.MinValue;
-            rightArmMinValues[i] = float.MaxValue;
-        }
-
         if (leftArmRMSFilter != null)
         {
             leftArmRMSFilter.OnDataReceived += HandleLeftArmData;
@@ -43,21 +43,25 @@ public class Calibration : MonoBehaviour
         {
             rightArmRMSFilter.OnDataReceived += HandleRightArmData;
         }
+
+        // Clear the message at the start
+        UpdateCalibrationMessage("");
     }
 
     private void Update()
     {
-        // Start calibration when the Spacebar is pressed
-        if (Input.GetKeyDown(KeyCode.Space))
+        // Allow manual restart if calibration failed
+        if (calibrationFailed && Input.GetKeyDown(KeyCode.Space))
         {
-            if (!isCalibrating)
-            {
-                StartCalibration();
-            }
-            else
-            {
-                StopCalibration();
-            }
+            UpdateCalibrationMessage("Restarting the Calibration...");
+            calibrationFailed = false; // Reset the failure flag
+            StartCalibration();
+        }
+
+        // Start calibration when the Spacebar is pressed and calibration is not in progress
+        if (!isCalibrating && !calibrationFailed && Input.GetKeyDown(KeyCode.Space))
+        {
+            StartCalibration();
         }
     }
 
@@ -81,8 +85,10 @@ public class Calibration : MonoBehaviour
         for (int i = 0; i < rmsValues.Length; i++)
         {
             leftArmMaxValues[i] = Mathf.Max(leftArmMaxValues[i], rmsValues[i]);
-            leftArmMinValues[i] = Mathf.Min(leftArmMinValues[i], rmsValues[i]);
         }
+
+        // Debug log to verify data
+        Debug.Log($"HandleLeftArmData: Updated leftArmMaxValues: {string.Join(", ", leftArmMaxValues)}");
     }
 
     private void HandleRightArmData(float[] rmsValues, double timestamp)
@@ -92,49 +98,15 @@ public class Calibration : MonoBehaviour
         for (int i = 0; i < rmsValues.Length; i++)
         {
             rightArmMaxValues[i] = Mathf.Max(rightArmMaxValues[i], rmsValues[i]);
-            rightArmMinValues[i] = Mathf.Min(rightArmMinValues[i], rmsValues[i]);
-        }
-    }
-
-    public void StartCalibration()
-    {
-        isCalibrating = true;
-        IsCalibrated = false;
-
-        // Reset min and max values
-        for (int i = 0; i < 8; i++)
-        {
-            leftArmMaxValues[i] = float.MinValue;
-            leftArmMinValues[i] = float.MaxValue;
-
-            rightArmMaxValues[i] = float.MinValue;
-            rightArmMinValues[i] = float.MaxValue;
         }
 
-        Debug.Log("Calibration started. For the right arm, move your hand up and down and contract your muscles. For the left arm, move your hand left and right and contract your muscles.");
-    }
-
-    public void StopCalibration()
-    {
-        isCalibrating = false;
-        IsCalibrated = true;
-
-        // Identify the primary channel for each arm
-        leftArmPrimaryChannel = GetPrimaryChannel(leftArmMaxValues);
-        rightArmPrimaryChannel = GetPrimaryChannel(rightArmMaxValues);
-
-        Debug.Log("Calibration completed.");
-        Debug.Log("Left Arm Max Values: " + string.Join(", ", leftArmMaxValues));
-        Debug.Log("Left Arm Min Values: " + string.Join(", ", leftArmMinValues));
-        Debug.Log("Right Arm Max Values: " + string.Join(", ", rightArmMaxValues));
-        Debug.Log("Right Arm Min Values: " + string.Join(", ", rightArmMinValues));
-        Debug.Log($"Left Arm Primary Channel: {leftArmPrimaryChannel}");
-        Debug.Log($"Right Arm Primary Channel: {rightArmPrimaryChannel}");
+        // Debug log to verify data
+        Debug.Log($"HandleRightArmData: Updated rightArmMaxValues: {string.Join(", ", rightArmMaxValues)}");
     }
 
     private int GetPrimaryChannel(float[] maxValues)
     {
-        int primaryChannel = 0;
+        int primaryChannel = -1; // Default to an invalid index
         float highestValue = float.MinValue;
 
         for (int i = 0; i < maxValues.Length; i++)
@@ -146,36 +118,208 @@ public class Calibration : MonoBehaviour
             }
         }
 
+        // Validate the index
+        if (primaryChannel < 0 || primaryChannel >= maxValues.Length || highestValue == float.MinValue)
+        {
+            Debug.LogError("GetPrimaryChannel: Invalid primary channel index or no valid data in maxValues.");
+        }
+
         return primaryChannel;
     }
 
-    public float[] NormalizeLeftArmData(float[] rmsValues)
+    private int GetSecondHighestChannel(float[] maxValues, int excludeChannel)
     {
-        float[] normalizedValues = new float[8];
-        for (int i = 0; i < rmsValues.Length; i++)
+        int secondHighestChannel = -1; // Default to an invalid index
+        float secondHighestValue = float.MinValue;
+
+        for (int i = 0; i < maxValues.Length; i++)
         {
-            normalizedValues[i] = Mathf.InverseLerp(leftArmMinValues[i], leftArmMaxValues[i], rmsValues[i]);
-        }
-        return normalizedValues;
-    }
+            if (i == excludeChannel) continue; // Skip the primary channel
 
-    public float[] NormalizeRightArmData(float[] rmsValues)
-    {
-        float[] normalizedValues = new float[8];
-        for (int i = 0; i < rmsValues.Length; i++)
+            if (maxValues[i] > secondHighestValue)
+            {
+                secondHighestValue = maxValues[i];
+                secondHighestChannel = i;
+            }
+        }
+
+        // Validate the index
+        if (secondHighestChannel < 0 || secondHighestChannel >= maxValues.Length)
         {
-            normalizedValues[i] = Mathf.InverseLerp(rightArmMinValues[i], rightArmMaxValues[i], rmsValues[i]);
+            Debug.LogError("GetSecondHighestChannel: Invalid second highest channel index.");
         }
-        return normalizedValues;
+
+        return secondHighestChannel;
     }
 
-    public int GetLeftArmPrimaryChannel()
+    public void StartCalibration()
     {
-        return leftArmPrimaryChannel;
+        if (isCalibrating) return;
+
+        isCalibrating = true;
+        IsCalibrated = false;
+
+        // Reset max values
+        ResetMaxValues();
+
+        // Start the calibration process
+        calibrationCoroutine = StartCoroutine(CalibrationProcess());
     }
 
-    public int GetRightArmPrimaryChannel()
+    private IEnumerator CalibrationProcess()
     {
-        return rightArmPrimaryChannel;
+        // Right arm up calibration
+        yield return StartCoroutine(DisplayCountdownMessage("Move your right arm up and contract your muscles.", calibrationDuration));
+        rightArmUpChannel = GetPrimaryChannel(rightArmMaxValues);
+
+        if (rightArmUpChannel < 0 || rightArmUpChannel >= rightArmMaxValues.Length)
+        {
+            UpdateCalibrationMessage("Calibration failed: Invalid right arm up channel.");
+            calibrationFailed = true;
+            isCalibrating = false;
+            yield break;
+        }
+
+        Debug.Log($"Right arm up channel: {rightArmUpChannel}");
+
+        // Reset and proceed to the next step
+        ResetMaxValues();
+
+        // Right arm down calibration
+        yield return StartCoroutine(DisplayCountdownMessage("Move your right arm down and contract your muscles.", calibrationDuration));
+        rightArmDownChannel = GetPrimaryChannel(rightArmMaxValues);
+
+        if (rightArmDownChannel < 0 || rightArmDownChannel >= rightArmMaxValues.Length)
+        {
+            UpdateCalibrationMessage("Calibration failed: Invalid right arm down channel.");
+            calibrationFailed = true;
+            isCalibrating = false;
+            yield break;
+        }
+
+        // Ensure the second channel is distinct
+        if (rightArmDownChannel == rightArmUpChannel)
+        {
+            rightArmDownChannel = GetSecondHighestChannel(rightArmMaxValues, rightArmUpChannel);
+        }
+
+        if (rightArmDownChannel < 0 || rightArmDownChannel >= rightArmMaxValues.Length)
+        {
+            UpdateCalibrationMessage("Calibration failed: Invalid right arm down channel after adjustment.");
+            calibrationFailed = true;
+            isCalibrating = false;
+            yield break;
+        }
+
+        Debug.Log($"Right arm down channel: {rightArmDownChannel}");
+
+        // Reset and proceed to the next step
+        ResetMaxValues();
+
+        // Left arm left calibration
+        yield return StartCoroutine(DisplayCountdownMessage("Move your left arm to the left and contract your muscles.", calibrationDuration));
+        leftArmLeftChannel = GetPrimaryChannel(leftArmMaxValues);
+
+        if (leftArmLeftChannel < 0 || leftArmLeftChannel >= leftArmMaxValues.Length)
+        {
+            UpdateCalibrationMessage("Calibration failed: Invalid left arm left channel.");
+            calibrationFailed = true;
+            isCalibrating = false;
+            yield break;
+        }
+
+        Debug.Log($"Left arm left channel: {leftArmLeftChannel}");
+
+        // Reset and proceed to the next step
+        ResetMaxValues();
+
+        // Left arm right calibration
+        yield return StartCoroutine(DisplayCountdownMessage("Move your left arm to the right and contract your muscles.", calibrationDuration));
+        leftArmRightChannel = GetPrimaryChannel(leftArmMaxValues);
+
+        if (leftArmRightChannel < 0 || leftArmRightChannel >= leftArmMaxValues.Length)
+        {
+            UpdateCalibrationMessage("Calibration failed: Invalid left arm right channel.");
+            calibrationFailed = true;
+            isCalibrating = false;
+            yield break;
+        }
+
+        // Ensure the second channel is distinct
+        if (leftArmRightChannel == leftArmLeftChannel)
+        {
+            leftArmRightChannel = GetSecondHighestChannel(leftArmMaxValues, leftArmLeftChannel);
+        }
+
+        if (leftArmRightChannel < 0 || leftArmRightChannel >= leftArmMaxValues.Length)
+        {
+            UpdateCalibrationMessage("Calibration failed: Invalid left arm right channel after adjustment.");
+            calibrationFailed = true;
+            isCalibrating = false;
+            yield break;
+        }
+
+        Debug.Log($"Left arm right channel: {leftArmRightChannel}");
+
+        // Calibration completed successfully
+        UpdateCalibrationMessage("Calibration completed successfully.");
+        yield return new WaitForSeconds(2f); // Wait for 2 seconds before clearing the message
+        UpdateCalibrationMessage(""); // Clear the message
+
+        isCalibrating = false;
+        IsCalibrated = true;
+    }
+
+    private IEnumerator DisplayCountdownMessage(string baseMessage, float duration)
+    {
+        float remainingTime = duration;
+
+        while (remainingTime > 0)
+        {
+            UpdateCalibrationMessage($"{baseMessage} ({remainingTime:F1}s remaining)");
+            yield return new WaitForSeconds(0.1f); // Update every 0.1 seconds
+            remainingTime -= 0.1f;
+        }
+
+        UpdateCalibrationMessage(baseMessage); // Final message without countdown
+    }
+
+    private void ResetMaxValues()
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            leftArmMaxValues[i] = 0f; // Reset to 0 instead of float.MinValue
+            rightArmMaxValues[i] = 0f; // Reset to 0 instead of float.MinValue
+        }
+
+        Debug.Log("ResetMaxValues: Arrays reset to 0.");
+    }
+
+    private void UpdateCalibrationMessage(string message)
+    {
+        if (calibrationMessage != null)
+        {
+            calibrationMessage.text = message; // Update the TextMeshProUGUI text
+        }
+    }
+
+    public int GetRightArmUpChannel()
+    {
+        return rightArmUpChannel;
+    }
+
+    public int GetRightArmDownChannel()
+    {
+        return rightArmDownChannel;
+    }
+
+    public int GetLeftArmLeftChannel()
+    {
+        return leftArmLeftChannel;
+    }
+
+    public int GetLeftArmRightChannel()
+    {
+        return leftArmRightChannel;
     }
 }
