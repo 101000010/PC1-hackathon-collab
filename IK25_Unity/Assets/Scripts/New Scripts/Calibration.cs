@@ -88,7 +88,7 @@ public class Calibration : MonoBehaviour
         }
 
         // Debug log to verify data
-        Debug.Log($"HandleLeftArmData: Updated leftArmMaxValues: {string.Join(", ", leftArmMaxValues)}");
+        //Debug.Log($"HandleLeftArmData: Updated leftArmMaxValues: {string.Join(", ", leftArmMaxValues)}");
     }
 
     private void HandleRightArmData(float[] rmsValues, double timestamp)
@@ -101,7 +101,7 @@ public class Calibration : MonoBehaviour
         }
 
         // Debug log to verify data
-        Debug.Log($"HandleRightArmData: Updated rightArmMaxValues: {string.Join(", ", rightArmMaxValues)}");
+        //Debug.Log($"HandleRightArmData: Updated rightArmMaxValues: {string.Join(", ", rightArmMaxValues)}");
     }
 
     private int GetPrimaryChannel(float[] maxValues)
@@ -121,7 +121,7 @@ public class Calibration : MonoBehaviour
         // Validate the index
         if (primaryChannel < 0 || primaryChannel >= maxValues.Length || highestValue == float.MinValue)
         {
-            Debug.LogError("GetPrimaryChannel: Invalid primary channel index or no valid data in maxValues.");
+            //Debug.LogError("GetPrimaryChannel: Invalid primary channel index or no valid data in maxValues.");
         }
 
         return primaryChannel;
@@ -146,7 +146,7 @@ public class Calibration : MonoBehaviour
         // Validate the index
         if (secondHighestChannel < 0 || secondHighestChannel >= maxValues.Length)
         {
-            Debug.LogError("GetSecondHighestChannel: Invalid second highest channel index.");
+            //Debug.LogError("GetSecondHighestChannel: Invalid second highest channel index.");
         }
 
         return secondHighestChannel;
@@ -169,7 +169,7 @@ public class Calibration : MonoBehaviour
     private IEnumerator CalibrationProcess()
     {
         // Right arm up calibration
-        yield return StartCoroutine(DisplayCountdownMessage("Move your right arm up and contract your muscles.", calibrationDuration));
+        yield return StartCoroutine(DisplayCountdownMessage("Move your right Hand up and hold it there.", calibrationDuration));
         rightArmUpChannel = GetPrimaryChannel(rightArmMaxValues);
 
         if (rightArmUpChannel < 0 || rightArmUpChannel >= rightArmMaxValues.Length)
@@ -186,7 +186,7 @@ public class Calibration : MonoBehaviour
         ResetMaxValues();
 
         // Right arm down calibration
-        yield return StartCoroutine(DisplayCountdownMessage("Move your right arm down and contract your muscles.", calibrationDuration));
+        yield return StartCoroutine(DisplayCountdownMessage("Move your right Hand down and hold it there.", calibrationDuration));
         rightArmDownChannel = GetPrimaryChannel(rightArmMaxValues);
 
         if (rightArmDownChannel < 0 || rightArmDownChannel >= rightArmMaxValues.Length)
@@ -217,7 +217,7 @@ public class Calibration : MonoBehaviour
         ResetMaxValues();
 
         // Left arm left calibration
-        yield return StartCoroutine(DisplayCountdownMessage("Move your left arm to the left and contract your muscles.", calibrationDuration));
+        yield return StartCoroutine(DisplayCountdownMessage("Move your left Hand to the left and hold it there.", calibrationDuration));
         leftArmLeftChannel = GetPrimaryChannel(leftArmMaxValues);
 
         if (leftArmLeftChannel < 0 || leftArmLeftChannel >= leftArmMaxValues.Length)
@@ -234,7 +234,7 @@ public class Calibration : MonoBehaviour
         ResetMaxValues();
 
         // Left arm right calibration
-        yield return StartCoroutine(DisplayCountdownMessage("Move your left arm to the right and contract your muscles.", calibrationDuration));
+        yield return StartCoroutine(DisplayCountdownMessage("Move your left Hand to the right and hold it there.", calibrationDuration));
         leftArmRightChannel = GetPrimaryChannel(leftArmMaxValues);
 
         if (leftArmRightChannel < 0 || leftArmRightChannel >= leftArmMaxValues.Length)

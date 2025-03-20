@@ -59,22 +59,17 @@ public class FlowerPlacer : MonoBehaviour
             float randomZ = Random.Range(-planeSize.z / 2, planeSize.z / 2);
             Vector3 randomPosition = new Vector3(randomX, 0, randomZ) + plane.transform.position;
 
-            Debug.Log($"Placing flower {i + 1} at position {randomPosition}");
-
             // Instantiate the flower prefab at the random position
             GameObject flowerInstance = Instantiate(flowerPrefab, randomPosition, Quaternion.identity);
 
             // Set the scale of the flower
             flowerInstance.transform.localScale = flowerScale;
 
-            // Adjust the flower's position so its lowest point touches the plane
-            Renderer flowerRenderer = flowerInstance.GetComponent<Renderer>();
-            if (flowerRenderer != null)
-            {
-                float flowerBottomY = flowerRenderer.bounds.min.y;
-                float adjustment = plane.transform.position.y - flowerBottomY;
-                flowerInstance.transform.position += new Vector3(0, adjustment, 0);
-            }
+            // Inherit the Y position of the original prefab
+            float originalY = flowerPrefab.transform.position.y;
+            flowerInstance.transform.position = new Vector3(flowerInstance.transform.position.x, originalY, flowerInstance.transform.position.z);
+
+            //Debug.Log($"Placing flower {i + 1} at position {flowerInstance.transform.position}");
         }
     }
 

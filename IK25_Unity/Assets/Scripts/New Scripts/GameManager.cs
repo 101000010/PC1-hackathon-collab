@@ -13,7 +13,11 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI lastFlowerScoreText; // TextMeshPro element to display the last collected flower's score
 
-    private bool isCalibrationComplete = false; // Tracks whether calibration is complete
+    [SerializeField]
+    private GameObject canvas; // Canvas GameObject to activate after calibration
+
+    [SerializeField]
+    private Calibration calibration; // Reference to the Calibration script
 
     private void Awake()
     {
@@ -31,7 +35,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        // Hide score and last flower score during calibration
+        // Hide score, last flower score, and canvas during calibration
         if (scoreText != null)
         {
             scoreText.gameObject.SetActive(false);
@@ -41,12 +45,30 @@ public class GameManager : MonoBehaviour
         {
             lastFlowerScoreText.gameObject.SetActive(false);
         }
+
+        if (canvas != null)
+        {
+            canvas.SetActive(false);
+        }
+
+        // Check if the Calibration script is assigned
+        if (calibration == null)
+        {
+            Debug.LogError("Calibration script is not assigned in the Inspector.");
+        }
+    }
+
+    private void Update()
+    {
+        // Check if calibration is complete and activate the canvas
+        if (calibration != null && calibration.IsCalibrated)
+        {
+            CompleteCalibration();
+        }
     }
 
     public void CompleteCalibration()
     {
-        isCalibrationComplete = true;
-
         // Show score and last flower score after calibration
         if (scoreText != null)
         {
@@ -57,11 +79,22 @@ public class GameManager : MonoBehaviour
         {
             lastFlowerScoreText.gameObject.SetActive(true);
         }
+
+        // Activate the canvas
+        if (canvas != null)
+        {
+            canvas.SetActive(true);
+            Debug.Log("Canvas activated.");
+        }
+        else
+        {
+            Debug.LogError("Canvas is not assigned in the Inspector.");
+        }
     }
 
     public void AddPoints(int points)
     {
-        if (!isCalibrationComplete)
+        if (calibration == null || !calibration.IsCalibrated)
         {
             Debug.LogWarning("Cannot add points before calibration is complete.");
             return;
@@ -72,13 +105,13 @@ public class GameManager : MonoBehaviour
         // Update the score in the TextMeshPro element
         if (scoreText != null)
         {
-            scoreText.text = "Score: " + score;
+            scoreText.text = score.ToString(); // Convert int to string
         }
 
         // Display the last collected flower's score
         if (lastFlowerScoreText != null)
         {
-            lastFlowerScoreText.text = "Last Flower: +" + points;
+            lastFlowerScoreText.text = points.ToString(); // Convert int to string
         }
 
         Debug.Log("Score: " + score);

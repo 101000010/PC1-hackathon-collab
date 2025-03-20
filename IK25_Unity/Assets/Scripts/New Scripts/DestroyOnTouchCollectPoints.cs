@@ -63,7 +63,7 @@ public class DestroyOnTouchCollectPoints : MonoBehaviour
         }
     }
 
-    private void AddPointsToScore(int points)
+    public void AddPointsToScore(int points)
     {
         GameManager.Instance.AddPoints(points);
     }
