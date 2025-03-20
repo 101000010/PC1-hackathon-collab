@@ -23,6 +23,9 @@ public class FlowerPlacer : MonoBehaviour
     [SerializeField]
     private int numberOfFlowers = 10; // Number of flower objects to place
 
+    [SerializeField]
+    private Vector3 flowerScale = Vector3.one; // Scale for the spawned flowers
+
     private void Start()
     {
         if (flowerPrefab1 == null || flowerPrefab2 == null || flowerPrefab3 == null || flowerPrefab4 == null || flowerPrefab5 == null)
@@ -56,8 +59,22 @@ public class FlowerPlacer : MonoBehaviour
             float randomZ = Random.Range(-planeSize.z / 2, planeSize.z / 2);
             Vector3 randomPosition = new Vector3(randomX, 0, randomZ) + plane.transform.position;
 
+            Debug.Log($"Placing flower {i + 1} at position {randomPosition}");
+
             // Instantiate the flower prefab at the random position
-            Instantiate(flowerPrefab, randomPosition, Quaternion.identity);
+            GameObject flowerInstance = Instantiate(flowerPrefab, randomPosition, Quaternion.identity);
+
+            // Set the scale of the flower
+            flowerInstance.transform.localScale = flowerScale;
+
+            // Adjust the flower's position so its lowest point touches the plane
+            Renderer flowerRenderer = flowerInstance.GetComponent<Renderer>();
+            if (flowerRenderer != null)
+            {
+                float flowerBottomY = flowerRenderer.bounds.min.y;
+                float adjustment = plane.transform.position.y - flowerBottomY;
+                flowerInstance.transform.position += new Vector3(0, adjustment, 0);
+            }
         }
     }
 
