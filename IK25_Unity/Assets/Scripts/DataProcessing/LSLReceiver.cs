@@ -7,7 +7,7 @@ public class LSLReceiver : AbstractDataProvider
     override public event Action<float[], double> OnDataReceived;
 
     [SerializeField]
-    private string StreamName = "DummyWorkload1";
+    private string StreamName = "BrainPower";
 
     private StreamInfo[] streamInfos;
     private StreamInlet streamInlet;
