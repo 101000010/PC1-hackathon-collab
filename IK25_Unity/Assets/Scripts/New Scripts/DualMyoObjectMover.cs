@@ -25,6 +25,9 @@ namespace PlayBionic.MyoOsu.Management
         [SerializeField]
         private float smoothingFactor = 0.1f; // Smoothing factor for input values
 
+        [SerializeField]
+        private float movementSpeedMultiplier = 1.0f; // Multiplier for movement speed
+
         private float horizontalInput = 0f; // Left/right rotation (controlled by left arm)
         private float forwardInput = 0f;   // Forward/backward movement (based on both arms)
         private float verticalInput = 0f; // Up/down movement (based on right arm)
@@ -109,13 +112,13 @@ namespace PlayBionic.MyoOsu.Management
             // Ensure forwardInput is positive for forward movement
             forwardInput = Mathf.Abs(forwardInput);
 
-            // Calculate movement direction based on the inputs
-            movementDirection = new Vector3(0, verticalInput, forwardInput); // Up/down (Y-axis), forward/backward (Z-axis)
+            // Calculate movement direction based on the inputs and apply the movement speed multiplier
+            movementDirection = new Vector3(0, verticalInput, forwardInput) * movementSpeedMultiplier; // Up/down (Y-axis), forward/backward (Z-axis)
 
-            // Apply movement
+            // Apply movement in the object's local space
             if (objectToMove != null)
             {
-                objectToMove.Translate(movementDirection * Time.deltaTime, Space.World);
+                objectToMove.Translate(movementDirection * Time.deltaTime, Space.Self); // Use Space.Self for local movement
 
                 // Apply rotation (yaw only)
                 objectToMove.Rotate(rotationDirection * Time.deltaTime, Space.Self);
