@@ -1,60 +1,29 @@
 using UnityEngine;
-using PlayBionic.MyoOsu.Management; // Add this to reference the DualObjectMover class
 
 public class ThirdPersonCamera : MonoBehaviour
 {
-    public float turnSpeed = 4.0f; // Speed of camera rotation
-    public GameObject target; // The object the camera follows
-    private float targetDistance; // Distance between the camera and the target
-    public float minTurnAngle = -90.0f; // Minimum vertical angle
-    public float maxTurnAngle = 90.0f; // Maximum vertical angle
-    private float rotX; // Vertical rotation (pitch)
-    private float rotY; // Horizontal rotation (yaw)
+    [Header("Target Settings")]
+    public Transform target; // The flying game object to follow
 
-    // Reference to the DualMyoObjectMover script
-    public DualMyoObjectMover dualObjectMover;
+    [Header("Camera Settings")]
+    public Vector3 offset = new Vector3(0, 2, -5); // Offset from the target
+    public float followSpeed = 5.0f; // Speed for smoothing camera position
+    public float rotationSpeed = 5.0f; // Speed for smoothing camera rotation
 
-    void Start()
+    private void LateUpdate()
     {
-        if (target == null)
-        {
-            Debug.LogError("Target is not assigned in ThirdPersonCamera.");
-            return;
-        }
+        if (target == null) return;
 
-        targetDistance = Vector3.Distance(transform.position, target.transform.position);
+        // Calculate the desired position based on the target's position and offset
+        Vector3 desiredPosition = target.position + target.rotation * offset;
 
-        if (dualObjectMover == null)
-        {
-            Debug.LogError("DualObjectMover is not assigned in ThirdPersonCamera.");
-        }
+        // Smoothly interpolate the camera's position
+        transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * followSpeed);
 
-        // Initialize rotation values
-        rotX = transform.eulerAngles.x;
-        rotY = transform.eulerAngles.y;
-    }
+        // Calculate the desired rotation to look at the target
+        Quaternion desiredRotation = Quaternion.LookRotation(target.position - transform.position);
 
-    void LateUpdate()
-    {
-        if (dualObjectMover == null || target == null) return;
-
-        // Get the inputs from the DualObjectMover script
-        float horizontalInput = dualObjectMover.GetHorizontalInput();
-        float verticalInput = dualObjectMover.GetVerticalInput();
-
-        // Update horizontal and vertical rotation based on input
-        rotY += horizontalInput * turnSpeed; // Horizontal rotation (yaw)
-        rotX += verticalInput * turnSpeed; // Vertical rotation (pitch)
-
-        // Clamp the vertical rotation to prevent flipping
-        rotX = Mathf.Clamp(rotX, minTurnAngle, maxTurnAngle);
-
-        // Apply the rotation to the camera relative to the target's rotation
-        Quaternion targetRotation = Quaternion.Euler(-rotX, rotY, 0) * target.transform.rotation;
-        transform.rotation = targetRotation;
-
-        // Maintain the camera's position relative to the target
-        Vector3 targetPosition = target.transform.position - (transform.forward * targetDistance);
-        transform.position = targetPosition;
+        // Smoothly interpolate the camera's rotation
+        transform.rotation = Quaternion.Slerp(transform.rotation, desiredRotation, Time.deltaTime * rotationSpeed);
     }
 }

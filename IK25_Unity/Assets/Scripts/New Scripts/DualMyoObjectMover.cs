@@ -20,32 +20,17 @@ namespace PlayBionic.MyoOsu.Management
         private float maxSpeed = 10f; // Maximum speed of the object
 
         [SerializeField]
+        private float rotationSpeed = 100f; // Speed of rotation
+
+        [SerializeField]
         private float smoothingFactor = 0.1f; // Smoothing factor for input values
 
-        private float maxRMSValue = 1.0f; // Maximum expected RMS value
-        [SerializeField]
-        private float leftValueMultiplier = 1.0f; // Adjustable multiplier for the leftValue
-
-        [SerializeField]
-
-        private float rightValueMultiplier = 1.0f; // Adjustable multiplier for the leftValue
-
-        [SerializeField]
-
-        private float upValueMultiplier = 1.0f; // Adjustable multiplier for the leftValue
-
-        [SerializeField]
-
-        private float downValueMultiplier = 1.0f; // Adjustable multiplier for the leftValue
-
-        [SerializeField]
-        private float deadZone = 0.1f; // Threshold for ignoring small inputs
-
-        private float horizontalInput = 0f; // Left/right movement (controlled by left arm)
-        private float verticalInput = 0f;   // Up/down movement (controlled by right arm)
-        private float forwardInput = 0f;   // Forward/backward movement (based on muscle strength)
+        private float horizontalInput = 0f; // Left/right rotation (controlled by left arm)
+        private float forwardInput = 0f;   // Forward/backward movement (based on both arms)
+        private float verticalInput = 0f; // Up/down movement (based on right arm)
 
         private Vector3 movementDirection = Vector3.zero;
+        private Vector3 rotationDirection = Vector3.zero; // Rotation direction (yaw only)
 
         private void Awake()
         {
@@ -81,28 +66,19 @@ namespace PlayBionic.MyoOsu.Management
             int leftChannel = calibration.GetLeftArmLeftChannel();
             int rightChannel = calibration.GetLeftArmRightChannel();
 
-            // Calculate horizontal input based on the difference between left and right channels
-            float leftValue = Mathf.Clamp(rmsValues[leftChannel], 0, 1)* leftValueMultiplier;
-            float rightValue = Mathf.Clamp(rmsValues[rightChannel], 0, 1)* rightValueMultiplier;
+            // Calculate horizontal rotation (yaw) based on the difference between left and right channels
+            float leftValue = Mathf.Clamp(rmsValues[leftChannel], 0, 1);
+            float rightValue = Mathf.Clamp(rmsValues[rightChannel], 0, 1);
 
-            float normalizedLeftValue = leftValue / maxRMSValue; // Replace maxRMSValue with the maximum expected RMS value
-            float normalizedRightValue = rightValue / maxRMSValue;
+            float targetYawInput = (rightValue - leftValue); // Positive for right, negative for left
+            horizontalInput = Mathf.Lerp(horizontalInput, targetYawInput * rotationSpeed, smoothingFactor);
 
-            float targetHorizontalInput = (normalizedRightValue - normalizedLeftValue); // Positive for right, negative for left
-            horizontalInput = Mathf.Lerp(horizontalInput, targetHorizontalInput * maxSpeed, smoothingFactor);
+            // Update rotation direction (yaw only)
+            rotationDirection = new Vector3(0, horizontalInput, 0); // Yaw (y-axis only)
 
-            // Use the average of left and right channels for forward/backward movement (z-axis)
-            float targetForwardInput = (normalizedLeftValue + normalizedRightValue) / 2; // Average strength
+            // Use the average of left and right channels for forward movement
+            float targetForwardInput = (leftValue + rightValue) / 2; // Average strength
             forwardInput = Mathf.Lerp(forwardInput, targetForwardInput * maxSpeed, smoothingFactor);
-
-            if (Mathf.Abs(normalizedLeftValue - normalizedRightValue) < deadZone)
-            {
-                horizontalInput = 0f;
-            }
-            else
-            {
-                horizontalInput = (normalizedRightValue - normalizedLeftValue) * maxSpeed;
-            }
         }
 
         private void HandleRightArmData(float[] rmsValues, double timestamp)
@@ -113,37 +89,16 @@ namespace PlayBionic.MyoOsu.Management
             int upChannel = calibration.GetRightArmUpChannel();
             int downChannel = calibration.GetRightArmDownChannel();
 
-            // Calculate vertical input based on the difference between up and down channels
-            float upValue = Mathf.Clamp(rmsValues[upChannel], 0, 1)* upValueMultiplier;
-            float downValue = Mathf.Clamp(rmsValues[downChannel], 0, 1)* downValueMultiplier;
+            // Calculate vertical movement (Y-axis) based on the difference between up and down channels
+            float upValue = Mathf.Clamp(rmsValues[upChannel], 0, 1);
+            float downValue = Mathf.Clamp(rmsValues[downChannel], 0, 1);
 
             float targetVerticalInput = (upValue - downValue); // Positive for up, negative for down
             verticalInput = Mathf.Lerp(verticalInput, targetVerticalInput * maxSpeed, smoothingFactor);
 
-            // Use the average of up and down channels for forward/backward movement (z-axis)
+            // Combine right arm input with left arm input for forward movement
             float targetForwardInput = (upValue + downValue) / 2; // Average strength
             forwardInput = Mathf.Lerp(forwardInput, targetForwardInput * maxSpeed, smoothingFactor);
-
-            if (Mathf.Abs(upValue - downValue) < deadZone)
-            {
-                verticalInput = 0f;
-            }
-            else
-            {
-                verticalInput = (upValue - downValue) * maxSpeed;
-            }
-        }
-
-        // Public method to get vertical input
-        public float GetVerticalInput()
-        {
-            return verticalInput;
-        }
-
-        // Public method to get horizontal input
-        public float GetHorizontalInput()
-        {
-            return horizontalInput;
         }
 
         private void Update()
@@ -151,17 +106,33 @@ namespace PlayBionic.MyoOsu.Management
             // Do not move the object if calibration is not complete
             if (calibration == null || !calibration.IsCalibrated) return;
 
+            // Ensure forwardInput is positive for forward movement
+            forwardInput = Mathf.Abs(forwardInput);
+
             // Calculate movement direction based on the inputs
-            movementDirection = new Vector3(horizontalInput, verticalInput, forwardInput); // Left/right (x), up/down (y), forward/backward (z)
+            movementDirection = new Vector3(0, verticalInput, forwardInput); // Up/down (Y-axis), forward/backward (Z-axis)
 
             // Apply movement
             if (objectToMove != null)
             {
-                objectToMove.Translate(movementDirection * Time.deltaTime);
+                objectToMove.Translate(movementDirection * Time.deltaTime, Space.World);
 
-                // Debug the movement direction
-                Debug.Log($"Movement Direction: {movementDirection}");
+                // Apply rotation (yaw only)
+                objectToMove.Rotate(rotationDirection * Time.deltaTime, Space.Self);
+
+                // Debug the movement and rotation directions
+                Debug.Log($"Movement Direction: {movementDirection}, Rotation Direction: {rotationDirection}");
             }
+        }
+
+        public float GetHorizontalInput()
+        {
+            return horizontalInput;
+        }
+
+        public float GetVerticalInput()
+        {
+            return forwardInput; // Assuming vertical input is represented by forwardInput
         }
     }
 }
